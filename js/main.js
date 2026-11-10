@@ -91,7 +91,7 @@ themeToggle.addEventListener('click', () => {
     }
 })();
 
-document.onloadeddata('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   renderProjects();
 });
    
