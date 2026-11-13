@@ -28,6 +28,9 @@ const themeToggle = document.querySelector('#theme-toggle')
 const htmlElement = document.documentElement;
 const projectsContainer = document.querySelector('.projects-container');
 
+const contactForm = document.querySelector('#contact-form');
+const formStatus = document.querySelector('#form-status');
+
 const renderProjects = () => {
 
     let allProjectsHTML = '';
@@ -93,6 +96,48 @@ themeToggle.addEventListener('click', () => {
 
 document.addEventListener('DOMContentLoaded', () => {
   renderProjects();
+
+  if(contactForm){
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(contactForm);
+      const submitButton = contactForm.querySelector('button[type="submit"]');
+
+      formStatus.innerHtml = 'Sending...';
+      formStatus.className = 'info';
+      formStatus.style.display = 'block';
+      submitButton.disabled = true;
+
+      fetch(contactForm.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      }).then(response => {
+        if(response.ok){
+          formStatus.innerHTML = 'Message sent successfully!';
+          formStatus.className = 'success';
+          contactForm.reset();
+        } else {
+          response.json().then(data => {
+            if(Object.hasOwn(data, 'errors')){
+              formStatus.innerHTML = data["errors"].map(error => error["message"]).join(", ");
+            } else {
+              formStatus.innerHTML = "Oops! Something went wrong. Please try again later.";
+            }
+            formStatus.className = 'error';
+          })
+        }
+      }).catch(error => {
+        formStatus.innerHTML = "Oops! A network error occurred. Please check your connection and try again.";
+        formStatus.className = 'error';
+      }).finally(() => {
+        submitButton.disabled = false;
+      })
+    })
+  }
 });
    
 
